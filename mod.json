@@ -1,0 +1,9 @@
+{
+	"name": "pictologic",
+	"displayName": "PicToLogic",
+	"author": "DeltaNedas, Router and another guy",
+	"description": "Adds a dialog for turning images into processor schematics.",
+	"version": "1.0.0",
+	"minGameVersion": 105,
+	"hidden": true
+}
