@@ -103,7 +103,7 @@ core.export = pixmap => {
 
 	var x, y, width = 0, height = 0;
 	for (var i in code) {
-		print([i, code[i])
+		print([i, code[i]])
 		x = xs[i];
 		y = ys[i];
 
