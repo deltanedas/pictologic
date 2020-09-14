@@ -70,42 +70,32 @@ core.export = pixmap => {
 		code.push(current.join("\n"));
 	}
 
-	var layer = 0, layersz = core.display.size;
-	// Max number of processors in a layer
-	var diffSqr = 0, lastSqr;
 	const xs = [], ys = [];
-	for (var i = 0; i < code.length; i++) {
-		if (i == diffSqr) {
-print("Reached square")
-			lastSqr = diffSqr;
-			diffSqr = (layersz + 1) * 4;
-			layersz += 2;
-			layer++;
-		}
+	// 14 processors + 9 display = 23 tiles, fits in a 5x5 square
+	const min = Math.ceil(Math.sqrt(core.display.size * core.display.size + code.length));
+	const offset = min - core.display.size;
+	const dispMin = Math.floor(offset / 2);
+	const dispMax = core.display.size + dispMin - 1;
+	var i = 0;
 
-		if ((i >= lastSqr) && i < (lastSqr + layersz)) {
-print("Bottom " + i)
-			xs[i] = lastSqr + layersz - (i + 1);
-			ys[i] = layer - 1;
-			continue;
-		}
+	print([min, offset, dispMin, dispMax])
+	for (var x = 0; x < min; x++) {
+		for (var y = 0; y < min; y++) {
+			if (i == code.length) {
+				// Have enough processors now, stop
+				x = null;
+				break;
+			}
 
-		if (i > (diffSqr - layersz)) {
-print("top " + i)
-			xs[i] = i - (diffSqr - layersz);
-			// last layer
-			ys[i] = layersz - 1;
-			print(" top y " + ys[i])
-			continue;
+			// Don't put processors inside the display
+			if (!(x >= dispMin && x <= dispMax &&
+					y >= dispMin && y <= dispMax)) {
+				xs[i] = x;
+				ys[i++] = y;
+			}
 		}
-
-		var middle = i - (lastSqr + layersz);
-		xs[i] = (middle % 2) ? layersz - 1 : 0;
-		ys[i] = layer + Math.floor(middle / 2);
-		print("Middle " + i + ": " + xs[i] +  "," + ys[i]);
+		if (x === null) break;
 	}
-
-	const offset = layer + Math.floor(core.display.size / 2);
 	const disp = new Tile(offset, offset,
 		Blocks.stone, Blocks.air, core.display);
 
@@ -113,6 +103,7 @@ print("top " + i)
 
 	var x, y, width = 0, height = 0;
 	for (var i in code) {
+		print([i, code[i])
 		x = xs[i];
 		y = ys[i];
 

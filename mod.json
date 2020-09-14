@@ -3,7 +3,7 @@
 	"displayName": "PicToLogic",
 	"author": "DeltaNedas, Router and another guy",
 	"description": "Adds a dialog for turning images into processor schematics.",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"minGameVersion": 105,
 	"hidden": true
 }
