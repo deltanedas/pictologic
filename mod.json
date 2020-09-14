@@ -2,8 +2,9 @@
 	"name": "pictologic",
 	"displayName": "PicToLogic",
 	"author": "DeltaNedas, Router and another guy",
-	"description": "Adds a dialog for turning images into processor schematics.",
+	"description": "Adds a dialog for turning images into processor schematics.\n[stat]Requires [#00aaff]DeltaNedas/ui-lib[].",
 	"version": "1.1.0",
+	"dependencies": ["ui-lib"],
 	"minGameVersion": 105,
 	"hidden": true
 }
