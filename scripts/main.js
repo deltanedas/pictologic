@@ -15,9 +15,6 @@ ui.addButton("pictologic", "paste", () => {
 ui.onLoad(() => {
 	ptl = new BaseDialog("PicToLogic");
 
-	ptl.button("$settings", Icon.settings, () => {
-		core.settings.show();
-	}).width(150);
 	ptl.row();
 	ptl.add("Copy the PNG image's contents to your clipboard!");
 	ptl.row();
@@ -25,6 +22,9 @@ ui.onLoad(() => {
 	ptl.row();
 
 	ptl.addCloseButton();
+	ptl.button("$settings", Icon.settings, () => {
+		core.settings.show();
+	}).width(150);
 	ptl.buttons.button("Export", Icon.export, () => {
 		try {
 			const raw = Core.app.clipboardText.bytes;
