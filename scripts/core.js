@@ -1,10 +1,12 @@
-const ui = this.global.uiLib;
+const ui = this.global.ui;
+const fast = require("pictologic/fast");
 
 const core = {
 	// settings //
 	display: Blocks.logicDisplay,
 	size: Blocks.logicDisplay.displaySize,
-	dialog: null
+	speed: LExecutor.maxInstructions,
+	settings: null
 };
 
 const stile = (tile, config) => new Schematic.Stile(tile.block(),
@@ -12,7 +14,7 @@ const stile = (tile, config) => new Schematic.Stile(tile.block(),
 
 core.build = () => {
 	const d = new BaseDialog("$settings");
-	core.dialog = d;
+	core.settings = d;
 
 	const displays = Vars.content.blocks().select(block => block instanceof LogicDisplay);
 
@@ -24,6 +26,11 @@ core.build = () => {
 			icon.region = d.icon(Cicon.full);
 		}, i => displays.get(i).localizedName);
 	}).width(200);
+
+	d.cont.row();
+	d.cont.field(core.speed, str => {
+		core.speed = parseInt(str);
+	}).width(200).get().validator = str => !isNaN(parseInt(str));
 
 	d.addCloseButton();
 };
@@ -37,35 +44,39 @@ core.export = pixmap => {
 	const code = [];
 	var current = [];
 	var drawCalls = 0;
+	var curColour;
 
 	const check = () => {
-		if ((drawCalls += 2) >= LExecutor.maxGraphicsBuffer) {
+		var ret = true;
+		if ((current.length + 2) >= core.speed) {
 			current.push("drawflush display1");
-			drawCalls = 0;
+			code.push(current.join("\n"));
+			current = [curColour];
+			drawCalls = 1;
+			ret = false;
 		}
 
-		if ((current.length + 3) >= LExecutor.maxInstructions) {
+		if (++drawCalls >= LExecutor.maxGraphicsBuffer) {
 			current.push("drawflush display1");
-			print(current.length);
-			code.push(current.join("\n"));
-			current = [];
+			current.push(curColour);
+			drawCalls = 1;
+			ret = false;
 		}
+
+		return ret;
 	};
 
-	pixmap.each((x, y) => {
-		const pixel = pixmap.getPixel(x, y);
-		const r = (pixel >> 24) & 0xff,
-			g = (pixel >> 16) & 0xff,
-			b = (pixel >> 8) & 0xff;
-
-		check();
-		current.push("draw color " + r + " " + g + " " + b);
-		current.push("draw rect " + x + " " + (core.size - y - 1) + " 1 1");
-	});
+	const out = fast(pixmap);
+	for (var colour in out) {
+		curColour = colour;
+		if (check()) current.push(colour);
+		for (var pix of out[colour]) {
+			check();
+			current.push("draw rect " + pix.x + " " + (core.size - pix.y - 1) + " 1 1");
+		}
+	}
 
 	if (current.length > 0) {
-		print("Curlen " + current.length);
-		// FIXME: It's possible that this will go over the limit
 		current.push("drawflush display1");
 		code.push(current.join("\n"));
 	}

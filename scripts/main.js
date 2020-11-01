@@ -16,18 +16,18 @@ ui.onLoad(() => {
 	ptl = new BaseDialog("PicToLogic");
 
 	ptl.button("$settings", Icon.settings, () => {
-		core.dialog.show();
+		core.settings.show();
 	}).width(150);
 	ptl.row();
-	ptl.add("Copy [green]base64 -w 0 < file.png[] to your clipboard!");
+	ptl.add("Copy the PNG image's contents to your clipboard!");
 	ptl.row();
-	ptl.add("Click [stat]export[] to make a schematic.");
+	ptl.add("Click [stat]Export[] to create a schematic.");
 	ptl.row();
 
 	ptl.addCloseButton();
-	ptl.buttons.button("$export", Icon.export, () => {
+	ptl.buttons.button("Export", Icon.export, () => {
 		try {
-			const raw = Packages.arc.util.serialization.Base64Coder.decode(Core.app.clipboardText);
+			const raw = Core.app.clipboardText.bytes;
 			const pixmap = new Pixmap(raw);
 			core.export(pixmap);
 		} catch (e) {
