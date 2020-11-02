@@ -28,9 +28,13 @@ core.build = () => {
 	}).width(200);
 
 	d.cont.row();
-	d.cont.field(core.speed, str => {
+
+	const speed = new Table();
+	speed.add("Speed: ").left();
+	speed.field(core.speed, str => {
 		core.speed = parseInt(str);
-	}).width(200).get().validator = str => !isNaN(parseInt(str));
+	}).growX().left().get().validator = str => !isNaN(parseInt(str));
+	d.cont.add(speed).size(64, 350);
 
 	d.addCloseButton();
 };
