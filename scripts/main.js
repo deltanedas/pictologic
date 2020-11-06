@@ -16,7 +16,7 @@ ui.onLoad(() => {
 
 	ptl = new BaseDialog("PicToLogic");
 
-	ptl.cont.add("[coral]1.[] Copy the PNG/JPG/BMP image's contents to your clipboard.");
+	ptl.cont.add("[coral]1.[] Copy [green]base64 -w 0 < image.png[] to your clipboard.");
 	ptl.cont.row();
 	ptl.cont.add("[coral]2.[] Click [stat]Export[] to create a schematic.");
 	ptl.cont.row();
@@ -27,7 +27,7 @@ ui.onLoad(() => {
 	}).width(150);
 	ptl.buttons.button("Export", Icon.export, () => {
 		try {
-			const raw = java.lang.String(Core.app.clipboardText).bytes;
+			const raw = Packages.arc.util.serialization.Base64Coder.decode(Core.app.clipboardText);;
 			const pixmap = new Pixmap(raw);
 			core.export(pixmap);
 		} catch (e) {
