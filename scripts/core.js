@@ -6,7 +6,8 @@ const core = {
 	display: Blocks.logicDisplay,
 	size: Blocks.logicDisplay.displaySize,
 	speed: LExecutor.maxInstructions,
-	settings: null
+	settings: null,
+	image: null
 };
 
 const stile = (tile, config) => new Schematic.Stile(tile.block(),

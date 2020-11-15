@@ -16,24 +16,28 @@ ui.onLoad(() => {
 
 	ptl = new BaseDialog("PicToLogic");
 
-	ptl.cont.add("[coral]1.[] Copy [green]base64 -w 0 < image.png[] to your clipboard.");
+	ptl.cont.add("[coral]1.[] Select a PNG image.");
 	ptl.cont.row();
 	ptl.cont.add("[coral]2.[] Click [stat]Export[] to create a schematic.");
 	ptl.cont.row();
 
+	ptl.cont.button("Select Image", () => {
+		readBinFile("png", "Schematic's source image", bytes => {
+			core.image = bytes;
+		});
+	});
+
 	ptl.addCloseButton();
 	ptl.buttons.button("$settings", Icon.settings, () => {
 		core.settings.show();
-	}).width(150);
+	});
 	ptl.buttons.button("Export", Icon.export, () => {
 		try {
-			const raw = Packages.arc.util.serialization.Base64Coder.decode(Core.app.clipboardText);;
-			const pixmap = new Pixmap(raw);
-			core.export(pixmap);
+			core.export(new Pixmap(core.image));
 		} catch (e) {
 			ui.showError("Failed to export schematic", e);
 		}
-	});
+	}).disabled = () => !core.image;
 
 	core.build();
 });
