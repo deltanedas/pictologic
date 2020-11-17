@@ -37,7 +37,7 @@ ui.onLoad(() => {
 		} catch (e) {
 			ui.showError("Failed to export schematic", e);
 		}
-	}).disabled = () => !core.image;
+	}).disabled(() => !core.image);
 
 	core.build();
 });
