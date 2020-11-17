@@ -22,10 +22,10 @@ ui.onLoad(() => {
 	ptl.cont.row();
 
 	ptl.cont.button("Select Image", () => {
-		readBinFile("png", "Schematic's source image", bytes => {
+		readBinFile("Schematic's source image", "png", bytes => {
 			core.image = bytes;
 		});
-	});
+	}).size(240, 50);
 
 	ptl.addCloseButton();
 	ptl.buttons.button("$settings", Icon.settings, () => {
