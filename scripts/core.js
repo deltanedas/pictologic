@@ -18,29 +18,32 @@ core.build = () => {
 	core.settings = d;
 
 	const displays = Vars.content.blocks().select(block => block instanceof LogicDisplay);
+	const t = new Table();
+	d.cont.add(t);
 
 	const icon = new TextureRegionDrawable(core.display.icon(Cicon.full));
-	d.cont.button("display", icon, () => {
-		ui.select("select display", displays, d => {
+	t.button("Display", icon, () => {
+		ui.select("Select Display", displays, d => {
 			core.display = d;
 			core.size = d.displaySize;
 			icon.region = d.icon(Cicon.full);
 		}, i => displays.get(i).localizedName);
-	}).width(200);
+	}).width(200).center();
 
-	d.cont.row();
+	t.row();
 
 	const speed = new Table();
-	speed.add("Speed: ").left();
+	speed.add("Speed: ").right();
 	speed.field(core.speed, str => {
 		core.speed = parseInt(str);
 	}).growX().left().get().validator = str => !isNaN(parseInt(str));
-	d.cont.add(speed).size(64, 350);
+	t.add(speed).size(64, 350).center();
 
 	d.addCloseButton();
 };
 
 core.export = pixmap => {
+	// Only resize if it's not perfect (uses linear filtering, for cubic use gimp, imagemagick or something)
 	if (pixmap.width != core.size || pixmap.height != core.size) {
 		pixmap = Pixmaps.scale(pixmap,
 			core.size / pixmap.width, core.size / pixmap.height);
@@ -75,9 +78,10 @@ core.export = pixmap => {
 	for (var colour in out) {
 		curColour = colour;
 		if (check()) current.push(colour);
-		for (var pix of out[colour]) {
+		for (var rect of out[colour]) {
 			check();
-			current.push("draw rect " + pix.x + " " + (core.size - pix.y - 1) + " 1 1");
+			// 0, 0 is the top left of a PNG and bottom left of a display, flip y
+			current.push("draw rect " + [rect.x, core.size - rect.y - rect.h, rect.w, rect.h].join(" "));
 		}
 	}
 
@@ -94,7 +98,6 @@ core.export = pixmap => {
 	const dispMax = core.display.size + dispMin - 1;
 	var i = 0;
 
-	print([min, offset, dispMin, dispMax])
 	for (var x = 0; x < min; x++) {
 		for (var y = 0; y < min; y++) {
 			if (i == code.length) {
@@ -112,9 +115,9 @@ core.export = pixmap => {
 		}
 		if (x === null) break;
 	}
+
 	const disp = new Tile(offset, offset,
 		Blocks.stone, Blocks.air, core.display);
-
 	const tiles = Seq.with(stile(disp, null));
 
 	var x, y, width = 0, height = 0;
