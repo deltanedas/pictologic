@@ -6,6 +6,9 @@ const core = {
 	display: Blocks.logicDisplay,
 	size: Blocks.logicDisplay.displaySize,
 	speed: LExecutor.maxInstructions,
+	quality: 255,
+
+	stage: "",
 	settings: null,
 	image: null
 };
@@ -18,26 +21,44 @@ core.build = () => {
 	core.settings = d;
 
 	const displays = Vars.content.blocks().select(block => block instanceof LogicDisplay);
-	const t = new Table();
-	d.cont.add(t);
+	d.cont.pane(t => {
+		const icon = new TextureRegionDrawable(core.display.icon(Cicon.full));
+		t.button("Display", icon, () => {
+			ui.select("Select Display", displays, d => {
+				core.display = d;
+				core.size = d.displaySize;
+				icon.region = d.icon(Cicon.full);
+			}, i => displays.get(i).localizedName);
+		}).height(120).growX().center();
 
-	const icon = new TextureRegionDrawable(core.display.icon(Cicon.full));
-	t.button("Display", icon, () => {
-		ui.select("Select Display", displays, d => {
-			core.display = d;
-			core.size = d.displaySize;
-			icon.region = d.icon(Cicon.full);
-		}, i => displays.get(i).localizedName);
-	}).width(200).center();
+		t.row();
 
-	t.row();
+		const speed = new Table();
+		speed.add("Speed: ").right();
+		speed.field(core.speed, str => {
+			core.speed = parseInt(str);
+		}).growX().left().get().validator = str => !isNaN(parseInt(str));
+		t.add(speed).height(64).growX().center();
 
-	const speed = new Table();
-	speed.add("Speed: ").right();
-	speed.field(core.speed, str => {
-		core.speed = parseInt(str);
-	}).growX().left().get().validator = str => !isNaN(parseInt(str));
-	t.add(speed).size(64, 350).center();
+		t.row();
+
+		const quality = new Table();
+		quality.add("Quality:").center().row();
+		var slider;
+		const field = quality.field("" + core.quality, t => {
+			const n = parseInt(t);
+			core.quality = "" + n;
+			slider.value = n;
+		}).growX().center().get();
+		field.validator = t => !isNaN(parseInt(t));
+
+		quality.row();
+		slider = quality.slider(0, 255, 1, core.quality, n => {
+			core.quality = n;
+			field.text = "" + n;
+		}).growX().center().get();
+		t.add(quality).height(128).growX().center();
+	}).growY().width(400);
 
 	d.addCloseButton();
 };
@@ -45,6 +66,7 @@ core.build = () => {
 core.export = pixmap => {
 	// Only resize if it's not perfect (uses linear filtering, for cubic use gimp, imagemagick or something)
 	if (pixmap.width != core.size || pixmap.height != core.size) {
+		core.stage = "Scaling...";
 		pixmap = Pixmaps.scale(pixmap,
 			core.size / pixmap.width, core.size / pixmap.height);
 	}
@@ -74,7 +96,9 @@ core.export = pixmap => {
 		return ret;
 	};
 
-	const out = fast(pixmap);
+	core.stage = "Optimising...";
+	const out = fast(core, pixmap);
+	core.stage = "Building code...";
 	for (var colour in out) {
 		curColour = colour;
 		if (check()) current.push(colour);
@@ -90,6 +114,7 @@ core.export = pixmap => {
 		code.push(current.join("\n"));
 	}
 
+	core.stage = "Building schematic...";
 	const xs = [], ys = [];
 	// 14 processors + 9 display = 23 tiles, fits in a 5x5 square
 	const min = Math.ceil(Math.sqrt(core.display.size * core.display.size + code.length));
@@ -138,12 +163,14 @@ core.export = pixmap => {
 		tiles.add(stile(build.tile, build.config()));
 	}
 
+	core.stage = "Saving...";
 	// Create a schematic
 	const tags = new StringMap();
 	tags.put("name", "!!name me");
 	const schem = new Schematic(tiles, tags, width, height);
 	// Import it
 	Vars.schematics.add(schem);
+	core.stage = "";
 };
 
 module.exports = core;

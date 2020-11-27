@@ -26,18 +26,26 @@ ui.onLoad(() => {
 			core.image = bytes;
 		});
 	}).size(240, 50);
+	ptl.cont.row();
+
+	ptl.cont.label(() => core.stage).center();
 
 	ptl.addCloseButton();
 	ptl.buttons.button("$settings", Icon.settings, () => {
 		core.settings.show();
 	});
 	ptl.buttons.button("Export", Icon.export, () => {
-		try {
-			core.export(new Pixmap(core.image));
-		} catch (e) {
-			ui.showError("Failed to export schematic", e);
-		}
-	}).disabled(() => !core.image);
+		new java.lang.Thread(() => {
+			try {
+				core.export(new Pixmap(core.image));
+			} catch (e) {
+				Core.app.post(() => {
+					ui.showError("Failed to export schematic", e);
+					core.stage = 0;
+				});
+			}
+		}, "PicToLogic worker").start();
+	}).disabled(() => !core.image || core.stage != 0);
 
 	core.build();
 });

@@ -1,3 +1,4 @@
+const indexer = require("pictologic/indexer");
 var used;
 
 function isUsed(x, y) {
@@ -47,7 +48,6 @@ function expandDown(pixmap, rect, colour) {
 }
 
 function rects(pixmap, rect, colour) {
-	print("Built rect for " + rect.x + ", " + rect.y)
 	// For marking new pixels as used
 	while (expandRight(pixmap, rect, colour));
 	while (expandDown(pixmap, rect, colour));
@@ -63,11 +63,22 @@ function getColour(pixel) {
 }
 
 /* Group identically-coloured rectangles */
-function group(pixmap) {
+function group(core, pixmap) {
+	// Merge colours by similarity
+	if (core.quality < 255) {
+		print("Index @ " + core.quality)
+		indexer(core, pixmap);
+	}
+
+	const percent = core.size / 100;
 	const out = {};
 	used = {};
 
 	pixmap.each((x, y) => {
+		if (y == 0) {
+			core.stage = "Opimising: Grouping: " + Math.floor(x / percent) + "%";
+		}
+
 		// If pixel is included in another rect, skip
 		if (isUsed(x, y)) return;
 
@@ -87,7 +98,5 @@ function group(pixmap) {
 
 	return out;
 };
-
-// TODO: 'index' colours with a quality threshold (see pngquant, port to js)
 
 module.exports = group;
