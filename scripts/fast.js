@@ -66,7 +66,6 @@ function getColour(pixel) {
 function group(core, pixmap) {
 	// Merge colours by similarity
 	if (core.quality < 255) {
-		print("Index @ " + core.quality)
 		indexer(core, pixmap);
 	}
 

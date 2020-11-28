@@ -23,7 +23,11 @@ ui.onLoad(() => {
 
 	ptl.cont.button("Select Image", () => {
 		readBinFile("Schematic's source image", "png", bytes => {
-			core.image = bytes;
+			try {
+				core.image = new Pixmap(bytes);
+			} catch (e) {
+				ui.showError("Failed to load source image", e);
+			}
 		});
 	}).size(240, 50);
 	ptl.cont.row();
@@ -37,15 +41,16 @@ ui.onLoad(() => {
 	ptl.buttons.button("Export", Icon.export, () => {
 		new java.lang.Thread(() => {
 			try {
-				core.export(new Pixmap(core.image));
+				core.export(core.image);
+				ptl.hide();
 			} catch (e) {
 				Core.app.post(() => {
 					ui.showError("Failed to export schematic", e);
-					core.stage = 0;
+					core.stage = "";
 				});
 			}
 		}, "PicToLogic worker").start();
-	}).disabled(() => !core.image || core.stage != 0);
+	}).disabled(() => !core.image || core.stage != "");
 
 	core.build();
 });

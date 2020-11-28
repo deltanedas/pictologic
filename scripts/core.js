@@ -7,6 +7,7 @@ const core = {
 	size: Blocks.logicDisplay.displaySize,
 	speed: LExecutor.maxInstructions,
 	quality: 255,
+	hsv: false,
 
 	stage: "",
 	settings: null,
@@ -22,6 +23,8 @@ core.build = () => {
 
 	const displays = Vars.content.blocks().select(block => block instanceof LogicDisplay);
 	d.cont.pane(t => {
+		t.defaults().growX().center();
+
 		const icon = new TextureRegionDrawable(core.display.icon(Cicon.full));
 		t.button("Display", icon, () => {
 			ui.select("Select Display", displays, d => {
@@ -29,35 +32,37 @@ core.build = () => {
 				core.size = d.displaySize;
 				icon.region = d.icon(Cicon.full);
 			}, i => displays.get(i).localizedName);
-		}).height(120).growX().center();
-
-		t.row();
+		}).height(120).row();
 
 		const speed = new Table();
 		speed.add("Speed: ").right();
 		speed.field(core.speed, str => {
 			core.speed = parseInt(str);
 		}).growX().left().get().validator = str => !isNaN(parseInt(str));
-		t.add(speed).height(64).growX().center();
-
-		t.row();
+		t.add(speed).height(64).row();
 
 		const quality = new Table();
 		quality.add("Quality:").center().row();
+		quality.defaults().growX().center();
+
 		var slider;
 		const field = quality.field("" + core.quality, t => {
 			const n = parseInt(t);
 			core.quality = "" + n;
 			slider.value = n;
-		}).growX().center().get();
+		}).get();
 		field.validator = t => !isNaN(parseInt(t));
 
 		quality.row();
 		slider = quality.slider(0, 255, 1, core.quality, n => {
 			core.quality = n;
 			field.text = "" + n;
-		}).growX().center().get();
-		t.add(quality).height(128).growX().center();
+		}).get();
+
+		quality.row();
+		quality.check("Use HSV", core.hsv, b => {core.hsv = b})
+			.disabled(() => core.quality == 255);
+		t.add(quality).height(160);
 	}).growY().width(400);
 
 	d.addCloseButton();
@@ -170,6 +175,10 @@ core.export = pixmap => {
 	const schem = new Schematic(tiles, tags, width, height);
 	// Import it
 	Vars.schematics.add(schem);
+	// Select it
+	Vars.ui.schematics.hide();
+	Vars.control.input.useSchematic(schem);
+
 	core.stage = "";
 };
 
