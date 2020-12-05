@@ -1,5 +1,6 @@
 # How to use
-To turn an image "rabbit.png" into base64 text:
-`base64 -w 0 < rabbit.png`
-Then copy it and click export.
-Select a larger display in settings > display.
+1. Go into schematics
+2. Click PicToLogic
+3. Select an image
+4. Adjust settings if you want
+5. Export and use the schematic
