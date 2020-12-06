@@ -146,7 +146,8 @@ core.export = pixmap => {
 		if (x === null) break;
 	}
 
-	const disp = new Tile(offset, offset,
+	const coord = dispMax - Math.floor(core.display.size / 2);
+	const disp = new Tile(coord, coord,
 		Blocks.stone, Blocks.air, core.display);
 	const tiles = Seq.with(stile(disp, null));
 
