@@ -5,6 +5,8 @@ function diff(a, b) {
 	return dh + ds + dv;
 }
 
+// Thread-local Tmp.c1
+const tmp = new Color();
 module.exports = (core, pixmap) => {
 	const palette = [];
 	const percent = core.size / 100;
@@ -13,7 +15,7 @@ module.exports = (core, pixmap) => {
 		core.stage = "Optimising: HSV Indexing: " + Math.floor(x / percent) + "%";
 		for (var y = 0; y < pixmap.height; y++) {
 			var raw = pixmap.getPixel(x, y);
-			var pixel = Tmp.c1.set(raw);
+			var pixel = tmp.set(raw);
 			pixel = Color.RGBtoHSV(pixel);
 
 			var add = true;

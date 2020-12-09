@@ -73,29 +73,60 @@ function group(core, pixmap) {
 	const out = {};
 	used = {};
 
-	pixmap.each((x, y) => {
-		if (y == 0) {
-			core.stage = "Opimising: Grouping: " + Math.floor(x / percent) + "%";
+	// each has a stroke idk why
+	const width = pixmap.width, height = pixmap.height;
+	for (var x = 0; x < width; x++) {
+		core.stage = "Opimising: Grouping: " + Math.floor(x / percent) + "%";
+		for (var y = 0; y < height; y++) {
+			// If pixel is included in another rect, skip
+			if (isUsed(x, y)) continue;
+
+			var pixel = pixmap.getPixel(x, y);
+			var colour = getColour(pixel);
+
+			var rect = {x: x, y: y, w: 1, h: 1};
+
+			// Merge many adjacent identical pixels as possible
+			rects(pixmap, rect, pixel);
+
+			if (out[colour]) {
+				out[colour].push(rect);
+			} else {
+				out[colour] = [rect];
+			}
 		}
-
-		// If pixel is included in another rect, skip
-		if (isUsed(x, y)) return;
-
-		const pixel = pixmap.getPixel(x, y);
-		const colour = getColour(pixel);
-		const rect = {x: x, y: y, w: 1, h: 1};
-
-		// Merge many adjacent identical pixels as possible
-		rects(pixmap, rect, pixel);
-
-		if (out[colour]) {
-			out[colour].push(rect);
-		} else {
-			out[colour] = [rect];
-		}
-	});
+	}
 
 	return out;
-};
+}
 
-module.exports = group;
+function blackBlend(pixel, alpha) {
+	const r = alpha * ((pixel >> 24) & 0xff),
+		g = alpha * ((pixel >> 16) & 0xff),
+		b = alpha * ((pixel >> 8) & 0xff);
+	return (r << 24) | (g << 16) | (b << 8) | 255;
+}
+
+// Thread-local Tmp.c1
+const tmp = new Color();
+function grayBlend(pixel, alpha) {
+	return tmp.set(pixel | 255).lerp(Pal.darkerMetal, alpha).rgba();
+}
+
+module.exports = (core, pixmap) => {
+	const percent = core.size / 100;
+	const blend = core.useGray ? grayBlend : blackBlend;
+	pixmap.each((x, y) => {
+		if (y == 0) {
+			core.stage = "Alpha Blending: " + Math.floor(x / percent) + "%";
+		}
+
+		const pixel = pixmap.getPixel(x, y);
+		const alpha = (pixel & 0xFF) / 255;
+		if (alpha == 1) return;
+
+		pixmap.draw(x, y, blend(pixel, alpha));
+	});
+
+	return group(core, pixmap);
+};

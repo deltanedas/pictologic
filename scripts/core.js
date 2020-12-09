@@ -1,4 +1,4 @@
-const ui = this.global.ui;
+const ui = global.ui;
 const fast = require("pictologic/fast");
 
 const core = {
@@ -8,6 +8,7 @@ const core = {
 	speed: LExecutor.maxInstructions,
 	quality: 255,
 	hsv: false,
+	useGray: false,
 
 	stage: "",
 	settings: null,
@@ -40,6 +41,10 @@ core.build = () => {
 			core.speed = parseInt(str);
 		}).growX().left().get().validator = str => !isNaN(parseInt(str));
 		t.add(speed).height(64).row();
+
+		// If false, transparency is simple channrl multiplication vs blending over displsy colour
+		t.check("Gray Transparency", core.useGray, b => {core.useGray = b})
+			.growX().center().row();
 
 		const quality = new Table();
 		quality.add("Quality:").center().row();
