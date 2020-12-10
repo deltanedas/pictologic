@@ -110,7 +110,7 @@ function blackBlend(pixel, alpha) {
 // Thread-local Tmp.c1
 const tmp = new Color();
 function grayBlend(pixel, alpha) {
-	return tmp.set(pixel | 255).lerp(Pal.darkerMetal, alpha).rgba();
+	return tmp.set(pixel | 255).lerp(Pal.darkerMetal, 1 - alpha).rgba();
 }
 
 module.exports = (core, pixmap) => {
