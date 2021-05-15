@@ -20,7 +20,7 @@ ui.onLoad(() => {
 	ptl.cont.row();
 	ptl.cont.add("[coral]2.[] Click [stat]Export[] to create a schematic.");
 	ptl.cont.row();
-	ptl.cont.add("[coral]Please dont use this for furry/weeb shit thank you");
+	ptl.cont.add("[coral]Please dont use this for NSFW behaviour, you got banned from community server admin thank you");
 	ptl.cont.row();
 
 	ptl.cont.button("Select Image", () => {
