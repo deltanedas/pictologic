@@ -43,7 +43,7 @@ ui.onLoad(() => {
 	ptl.buttons.button("Export", Icon.export, () => {
 		new java.lang.Thread(() => {
 			try {
-				core.export();
+				core.export(core.image);
 				ptl.hide();
 			} catch (e) {
 				Core.app.post(() => {
