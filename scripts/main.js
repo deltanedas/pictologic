@@ -24,8 +24,9 @@ ui.onLoad(() => {
 	ptl.cont.row();
 
 	ptl.cont.button("Select Image", () => {
-		readBinFile("Schematic's source image", "png", bytes => {
+		Vars.platform.showFileChooser(false, "png", file => {
 			try {
+				const bytes = file.readBytes();
 				core.image = new Pixmap(bytes);
 			} catch (e) {
 				ui.showError("Failed to load source image", e);

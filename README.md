@@ -1,3 +1,6 @@
+# version
+v7 136 minimum
+
 # How to use
 1. Go into schematics
 2. Click PicToLogic

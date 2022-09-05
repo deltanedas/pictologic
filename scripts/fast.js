@@ -22,7 +22,7 @@ function expandRight(pixmap, rect, colour) {
 	const x = rect.x + rect.w;
 	for (var i = 0; i < rect.h; i++) {
 		var y = rect.y + i;
-		if (pixmap.getPixel(x, y) != colour || isUsed(x, y)) {
+		if (pixmap.get(x, y) != colour || isUsed(x, y)) {
 			return false;
 		}
 	}
@@ -37,7 +37,7 @@ function expandDown(pixmap, rect, colour) {
 	for (var i = 0; i < rect.w; i++) {
 		var x = rect.x + i;
 		// TODO: check for out-of-bounds
-		if (pixmap.getPixel(x, y) != colour || isUsed(x, y)) {
+		if (pixmap.get(x, y) != colour || isUsed(x, y)) {
 			return false;
 		}
 	}
@@ -81,7 +81,7 @@ function group(core, pixmap) {
 			// If pixel is included in another rect, skip
 			if (isUsed(x, y)) continue;
 
-			var pixel = pixmap.getPixel(x, y);
+			var pixel = pixmap.get(x, y);
 			var colour = getColour(pixel);
 
 			var rect = {x: x, y: y, w: 1, h: 1};
@@ -121,7 +121,7 @@ module.exports = (core, pixmap) => {
 			core.stage = "Alpha Blending: " + Math.floor(x / percent) + "%";
 		}
 
-		const pixel = pixmap.getPixel(x, y);
+		const pixel = pixmap.get(x, y);
 		const alpha = (pixel & 0xFF) / 255;
 		if (alpha == 1) return;
 

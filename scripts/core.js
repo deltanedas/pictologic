@@ -26,12 +26,12 @@ core.build = () => {
 	d.cont.pane(t => {
 		t.defaults().growX().center();
 
-		const icon = new TextureRegionDrawable(core.display.icon(Cicon.full));
+		const icon = new TextureRegionDrawable(core.display.uiIcon);
 		t.button("Display", icon, () => {
 			ui.select("Select Display", displays, d => {
 				core.display = d;
 				core.size = d.displaySize;
-				icon.region = d.icon(Cicon.full);
+				icon.region = d.uiIcon;
 			}, i => displays.get(i).localizedName);
 		}).height(120).row();
 
