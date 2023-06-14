@@ -9,6 +9,17 @@ function mark(x, y) {
 	used[x + "," + y] = true;
 }
 
+// compat with older arc versions (or custom builds which are assumed to be up to date)
+if (Version.build >= 144 || Version.build == -1) {
+	function draw(pixmap, x, y, col) {
+		pixmap.set(x, y, col);
+	}
+} else {
+	function draw(pixmap, x, y, col) {
+		pixmap.draw(x, y, col);
+	}
+}
+
 // Mark a fully expanded rect's pixels as used
 function markRect(rect) {
 	for (var x = 0; x < rect.w; x++) {
@@ -125,7 +136,7 @@ module.exports = (core, pixmap) => {
 		const alpha = (pixel & 0xFF) / 255;
 		if (alpha == 1) return;
 
-		pixmap.draw(x, y, blend(pixel, alpha));
+		draw(pixmap, x, y, blend(pixel, alpha));
 	});
 
 	return group(core, pixmap);
